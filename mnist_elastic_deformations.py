@@ -113,6 +113,34 @@ print(confusion_matrix(test_label, predictions))
 print(accuracy_score(test_label, predictions))
 #accuray = 0.9692
 
+clf = RandomForestClassifier(n_estimators=250, 
+                             n_jobs=-1, 
+                             random_state=42, 
+                             class_weight='balanced',
+                             criterion='gini'
+                             
+)
+
+clf.fit(temp, labels)
+
+predictions = clf.predict(test_image)
+print(predictions)
+
+print(confusion_matrix(test_label, predictions))
+#[[825   0   0   0   2   1   0   0   2   1]
+# [  0 968   5   2   3   0   1   2   0   2]
+# [  3   2 795   2   1   0   1  15   5   1]
+# [  2   2   7 786   0   5   1   7   5   7]
+# [  0   4   0   0 813   0   3   1   0  14]
+# [  0   1   1  13   0 689   3   0   1   1]
+# [  5   2   0   0   0   3 844   0   1   0]
+# [  0   2   4   0   1   0   0 886   1   5]
+# [  4   4   3   4   4   6   4   0 784  11]
+# [  3   2   0  11   6   2   0   5   2 786]]
+print(accuracy_score(test_label, predictions))
+#accuracy = 0.97333
+
+
 train_x = temp[:,:].reshape(temp.shape[0], 28, 28, 1).astype('float32')
 train_y = to_categorical(labels, 10)
 
