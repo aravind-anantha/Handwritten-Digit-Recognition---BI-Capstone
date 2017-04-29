@@ -8,17 +8,19 @@ from sklearn import decomposition
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC, SVC
 
-
+#Reading input data, the data is from the kaggle dataset on digit recognition
 data = pd.read_csv('train.csv')
-
+#Splitting the data into traina and tes, 80% and 20% respectively
 train, test = np.split(data.sample(frac=1), [int(0.8*len(data))])
 
+#train_label contains class labels, 0 to 9 since we are classifying digits
+#Converting the pixels of the image to float for normalization
 train_label = train['label']
 train_image = (train.ix[:,1:].values).astype('float32')
-
 test_label = test['label']
 test_image = (test.ix[:,1:].values).astype('float32')
 
+#Normalizing the data
 train_image = train_image / 255
 test_image = test_image / 255
 
@@ -28,7 +30,7 @@ pca.fit(train_image)
 fig = plt.plot(pca.explained_variance_ratio_)
 #plt.savefig('pca.png')
 
-
+#Fitting a PCA model with 40 principal components
 pca = decomposition.PCA(n_components = 40)
 pca.fit(train_image)
 train_pca = np.array(pca.transform(train_image))

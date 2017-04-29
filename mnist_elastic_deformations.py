@@ -16,22 +16,28 @@ from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Conv2D, MaxPooling2D
 from sklearn.metrics import confusion_matrix, accuracy_score
 
-
+#Reading input data, the data is from the kaggle dataset on digit recognition
 data = pd.read_csv('train.csv')
 
+#Splitting the data into traina and tes, 80% and 20% respectively
 train, test = np.split(data.sample(frac=1), [int(0.8*len(data))])
 
+#train_label contains class labels, 0 to 9 since we are classifying digits
 train_label = train['label']
-train_image = (train.ix[:,1:].values).astype('float32')
-
 test_label = test['label']
+#Converting the pixels of the image to float for normalization
+train_image = (train.ix[:,1:].values).astype('float32')
 test_image = (test.ix[:,1:].values).astype('float32')
 
+#Normalizing the data
 train_image = train_image / 255
 test_image = test_image / 255
 
-
-
+#Function that does elastic deformations on the images as described in Simard 2003
+#The function works as follows
+#First random displacement fields are generated for the pixels
+#Then the distortion fields are convolved with a Gaussian of std dev sigma
+#The distortion fields are then multiplied with a scaling factor alpha which controls the level of distortion
 def elastic_deformation(image, alpha, sigma):
     random_state = np.random.RandomState(None)
     shape = image.shape
@@ -44,31 +50,34 @@ def elastic_deformation(image, alpha, sigma):
     
     return map_coordinates(image, indices, order=1).reshape(shape)
 
+#Reshaping the data into 28x28 form as in the original image
 t = train_image.reshape(train_image.shape[0], 28, 28)
 
+#Optimal values for alpha and sigma found from Ciresan 2011 https://arxiv.org/pdf/1103.4487.pdf 
 for i in range(len(train_image)):
     img = elastic_deformation(t[i], 36, 8)
     img = img[np.newaxis, :, :]
     t = np.concatenate((t, img))
 
+#Appending labels to the distorted images from the original set
 labels = train_label.append(train_label[:], ignore_index = True)
 
+#Printing out a few images to show example of distortions, the image files can be found in the submission
 for i in range(6, 9):
     plt.subplot(330 + (i+1))
     plt.imshow(t[i], cmap=plt.get_cmap('gray'))
     plt.title(labels[i]);
-
 plt.savefig('before_deformation.png')
 
 for i in range(33606, 33609):
     plt.subplot(330 + (i+1) - 33600)
     plt.imshow(t[i], cmap=plt.get_cmap('gray'))
     plt.title(labels[i]);
-
 plt.savefig('after_deformation.png')
 
 temp = t.reshape(t.shape[0], -1)
 
+#An SVC with RBF kernel
 clf = SVC(C=12,
           kernel='rbf',
           class_weight='balanced',
@@ -93,6 +102,7 @@ print(confusion_matrix(test_label, predictions))
 print(accuracy_score(test_label, predictions))
 #accuracy = 0.9646
 
+#A KNN classifier
 clf = KNeighborsClassifier(n_neighbors=4,algorithm='auto',n_jobs=10)
 clf.fit(temp, labels)
 
@@ -113,6 +123,7 @@ print(confusion_matrix(test_label, predictions))
 print(accuracy_score(test_label, predictions))
 #accuray = 0.9692
 
+#A Random Forest classifier
 clf = RandomForestClassifier(n_estimators=250, 
                              n_jobs=-1, 
                              random_state=42, 
@@ -140,18 +151,16 @@ print(confusion_matrix(test_label, predictions))
 print(accuracy_score(test_label, predictions))
 #accuracy = 0.97333
 
-
+#Reshaping data to fit a Convolutional Neural Network
 train_x = temp[:,:].reshape(temp.shape[0], 28, 28, 1).astype('float32')
 train_y = to_categorical(labels, 10)
-
 test_x = test_image[:,:].reshape(test_image.shape[0], 28, 28, 1).astype('float32')
 
-
+#Checking backend channel for the tensorflow network
 from keras import backend
-
 backend.image_data_format()
 
-
+#Fitting a CNN model
 model = Sequential()
 model.add(Conv2D(32, kernel_size=(3, 3),
                  activation='relu',
