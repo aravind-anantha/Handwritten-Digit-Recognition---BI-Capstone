@@ -81,3 +81,30 @@ print(confusion_matrix(test_label, predictions))
 # [  3   3   3  11  21   4   1  16   4 780]]
 print(accuracy_score(test_label, predictions))
 #accuracy = 0.9555
+
+#Adding a Random Forest Model
+lf = RandomForestClassifier(n_estimators=250,
+                              n_jobs=-1,
+                              random_state=42,
+                              class_weight='balanced',
+                              criterion='gini'
+ )
+
+clf.fit(train_image, train_label)
+
+predictions = clf.predict(test_image)
+print(predictions)
+
+print(confusion_matrix(test_label, predictions))
+# [  0 968   4   5   3   1   0   1   0   1]
+# [  6   0 785   3   5   0   3  17   5   1]
+# [  2   1   8 773   1   7   2   7  12   9]
+# [  0   2   0   1 810   0   2   1   1  18]
+# [  0   0   0  15   0 683   2   0   4   5]
+# [  6   2   0   0   2   8 833   0   4   0]
+# [  1   2   4   2   3   1   0 878   1   7]
+# [  3   4   1   7   4   6   3   0 784  12]
+# [  3   1   0  10   7   2   0   5   2 787]]
+
+print(accuracy_score(test_label, predictions))
+#accuracy = 0.9669

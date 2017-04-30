@@ -151,6 +151,7 @@ print(confusion_matrix(test_label, predictions))
 print(accuracy_score(test_label, predictions))
 #accuracy = 0.97333
 
+
 #Reshaping data to fit a Convolutional Neural Network
 train_x = temp[:,:].reshape(temp.shape[0], 28, 28, 1).astype('float32')
 train_y = to_categorical(labels, 10)
