@@ -40,7 +40,7 @@ def rbfnn(X, y, epochs, eta, X_test):
     #weights between hidden and output layer are initialized randomly
     w = (2 * np.random.random((c, nodes)) - 1) * 0.25
 
-    '''loop for backpropagation in every iteration a data point is 
+    '''loop for backpropagation: in every iteration a data point is 
     selected and the weigths are backpropaged according to the formula'''
     
     for iteration in range(epochs):
@@ -49,13 +49,13 @@ def rbfnn(X, y, epochs, eta, X_test):
         temp = []
         X_new = []
         
-        #forward propagation first layer to hidden layer it in X_new 
+        #forward propagation first layer to hidden layer and store it in X_new 
         for j in range(len(centers)):
             var = np.linalg.norm(current - centers[j])
             temp.append(exp(-1 * var * var / 2))
-
         X_new = np.array(temp)
-        #forward propagation hidden layer to output layer it ans then in Y
+        
+        #forward propagation hidden layer to output layer and store it in Y
         #(after using transfer function)
         ans = np.dot(w, X_new)
         Y, der = [], []
@@ -78,7 +78,8 @@ def rbfnn(X, y, epochs, eta, X_test):
             for j in range(64):
                 centers[p][j] -= eta * val[p] * (current[j] - centers[p][j])
     
-    ''' end of backprpogation calluate the output using forward pass'''
+    ''' end of backpropagation layer '''
+    ''' Now calculate the output using forward pass'''
     res = []
     for data in X_test:
         temp = []
