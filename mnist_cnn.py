@@ -10,22 +10,26 @@ from keras.layers import Conv2D, MaxPooling2D
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 
-
+#Reading input data, the data is from the kaggle dataset on digit recognition
 data = pd.read_csv('train.csv')
 
+#Splitting the data into traina and tes, 80% and 20% respectively
 train, test = np.split(data.sample(frac=1), [int(0.8*len(data))])
 
+#Reshaping data to fit a Convolutional Neural Network
 train_x = train.values[:,1:].reshape(train.shape[0], 28, 28, 1).astype('float32') / 255
+#train_label contains class labels, 0 to 9 since we are classifying digits
+#Converting labels to one-hot encoding
 train_y = to_categorical(train.values[:, 0], 10)
 
 test_x = test.values[:,1:].reshape(test.shape[0], 28, 28, 1).astype('float32') / 255
 test_y = test.values[:,0]
 
+#Checking backend channel for the tensorflow network
 from keras import backend
-
 backend.image_data_format()
 
-
+#Fitting a CNN model
 model = Sequential()
 model.add(Conv2D(32, kernel_size=(3, 3),
                  activation='relu',
